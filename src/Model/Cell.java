@@ -15,27 +15,22 @@ public class Cell {
 
 
     //Constructors:
+
     /**
      * Constructor for a single cell. 
      * 
-     * @param value  Value stored at cell, where 0 represents an empty cell.
-     * @param rowNumber  Index of the row this cell is located in. 
-     * @param ColumnNumber  Index of the column this cell is located in. 
+     * @param value  An int representing value stored at cell, where 0 represents an empty cell.
+     * @param rowNumber  An int representing the index of the row this cell is located in. 
+     * @param ColumnNumber  An int representing the index of the column this cell is located in. 
      * @throws IllegalArgumentException  If value is not between [0, 9], or if the rowNumber or columnNumber is not within [0, 8]
      */
     public Cell(int value, int rowNumber, int columnNumber) throws IllegalArgumentException {
         //First check validity of all inputs: 
-        checkValue(value);
-
-        if (rowNumber < 0 || rowNumber > Constants.GRID_SIZE - 1) {
-            throw new IllegalArgumentException("Row number " + rowNumber + " is out of range. "); 
-        }
-
-        if (columnNumber < 0 || columnNumber > Constants.GRID_SIZE - 1) {
-            throw new IllegalArgumentException("Column number " + columnNumber + " is out of range. ");
-        }
+        Constants.checkValue(value);
+        Constants.checkRowIndex(rowNumber);
+        Constants.checkColumnIndex(columnNumber);
     
-        //If valid inputs, continue to intiialization: 
+        //If valid inputs, continue to initialization: 
         this.value = value; 
         this.rowNumber = rowNumber; 
         this.columnNumber = columnNumber; 
@@ -48,39 +43,7 @@ public class Cell {
             complete = true; 
         }
 
-        /*
-         * The following section calculates the boxNumber index based on which row and column the Cell is located in. 
-         * To follow the logic easily, draw out a 9x9 grid with the row, column, and box indices labelled. 
-         * 
-         * - Logically we see that: 
-         *      If the row index is between [0, 2]  ->  the box index will be between [0, 2]
-         *      If the row index is between [3, 5]  ->  the box index will be between [3, 5]
-         *      If the row index is between [6, 8]  ->  the box index will be between [6, 8]
-         *  Using this, we can set the boxNumber be either 0, 3, or 6 depending on the rowNumber. 
-         * 
-         * - Then, we use the column number to set the final boxNumber. 
-         *   Logically we see that:
-         *      If the column index is between [0, 2]  ->  the box index does not need to be changed (it will be either 0, 3, or 6)
-         *      If the column index is between [3, 5]  ->  the box index will be either 1, 4, or 7  (i.e., increment once)
-         *      If the column index is between [6, 8]  ->  the box index will be either 2, 5, or 8  (i.e., increment twice) 
-         */
-        if (rowNumber < 3) {
-            boxNumber = 0;
-        }
-        else if (rowNumber >=3 && rowNumber < 6) {
-            boxNumber = 3;
-        }
-        else //if rowNumber >=6
-        {
-            boxNumber = 6;
-        }
-
-        if (columnNumber >=3 && columnNumber <6) {
-            boxNumber += 1;
-        }
-        else if (columnNumber >= 6) {
-            boxNumber += 2;
-        }
+        boxNumber = Constants.calculateBoxIndex(rowNumber, columnNumber); 
     }
     
 
@@ -89,13 +52,29 @@ public class Cell {
     public int getRowNumber() { return rowNumber; }
     public int getColumnNumber() { return columnNumber; }
     public int getBoxNumber() { return boxNumber; }
+    public int getValue() { return value; }
 
 
     //Setters:
+    public void setValue(int value) { 
+        if (value == 0) {
+            complete = false; 
+        }
+        else {
+            complete = true; 
+        }
+
+        this.value = value; 
+    }
 
 
 
     //Other:
+    /**
+     * Clear the Cell of it's value. 
+     * 
+     * @return  true if task was completed successfully. 
+     */
     public boolean clear() {
         value = Constants.UNKNOWN_VALUE; 
         potentialValues.clear();
@@ -103,34 +82,38 @@ public class Cell {
         return true; 
     }
 
+    /**
+     * Adds a value to the set representing the potential values this Cell could possibly be. 
+     * 
+     * @param value An int representing a possible value that could be stored at cell.
+     * @return  true if value was added successfully, and false otherwise. 
+     */
     public boolean addPotentialValue(int value) {
+        if (complete) {
+            return false; 
+        }
+
+        //Could check value is between [1, 9]; however users will not have direct access to this function, thus not necessary. 
+
         return potentialValues.add(value); 
     }
 
+    /**
+     * Deletes a value from the set representing the potential values this Cell could possibly be.
+     * 
+     * @param value An int representing the value to be removed from set. 
+     * @return  true if value was removed successfully, and false otherwise. 
+     */
     public boolean removePotentialValue(int value) {
         return potentialValues.remove(value); 
     }
 
-    public String toString() {
-        if (value == 0) {
-            return " "; 
-        }
-        return "" + value; 
-    }
-
-
-    //Helper Functions:
     /**
-     * Used to check if the value given by user is valid. 
+     * Represents the Cell as a String. 
      * 
-     * @param value  Value stored at cell, where 0 represents an empty cell.
-     * @throws IllegalArgumentException  If value is not between [0, 9]. 
+     * @return The value at the Cell in string format. 
      */
-    private void checkValue(int value) throws IllegalArgumentException {
-        if (value < Constants.UNKNOWN_VALUE || value > Constants.MAX_VALUE) {
-            throw new IllegalArgumentException("Value " + value + " is out of range. ");        //will eventually be caught by controller class, which then re-prompts user for valid input 
-        } 
-    }
-
-    
+    public String toString() {
+        return "" + value; 
+    }    
 }

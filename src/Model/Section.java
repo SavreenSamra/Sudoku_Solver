@@ -1,12 +1,25 @@
 //Abstract class representing 9 cells grouped together
 
-package Model; 
+package Model;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class Section {
     private Cell[] cell; 
     private boolean complete; 
 
     //Constructors 
+    /**
+     * Constructor for a Section, which are 9 Cells grouped together in the puzzle. 
+     * 
+     * @param type  A string representing what type of section this is. "R" = row, "C" = column, "B" = box.
+     * @param index An int representing the index of this Section. 
+     * @param values  An int[] holding the values stores at each Cell in Section.
+     * @throws IllegalArgumentException If type is not "R", "C", or "B", if index is not within [0, 8], if int[] does not have 9 values, or if the Cell constructor throws an IllegalArguementException.
+     */
     public Section(String type, int index, int[] values) throws IllegalArgumentException {
         //First check validity of all inputs: 
         if (type != "R" || type != "C" || type != "B") {
@@ -21,12 +34,11 @@ public class Section {
             throw new IllegalArgumentException("Number of values inputted, " + values.length + ", is invalid. ");
         }
 
-
         //If valid inputs, continue to intiialization: 
         cell = new Cell[Constants.GRID_SIZE]; 
 
         /*
-         * The following section calculates which row and column the first Cell of our Section is located in. 
+         * The following section calculates the row and column index that the first Cell of our Section is located in. 
          * To follow the logic easily, draw out a 9x9 grid with the row, column, and box indices labelled. 
          * 
          * - Logically we see that: 
@@ -53,34 +65,109 @@ public class Section {
             rowNumber = 0; 
         }
         else {
-            
-            
+            if (index < 3) {
+                rowNumber = 0; 
+            }
+            else if (index >= 3 && index < 6) {
+                rowNumber = 3; 
+            }
+            else {
+                rowNumber = 6; 
+            }
+
+            if (index % 3 == 0) {
+                columnNumber = 0; 
+            }
+            else if (index % 3 == 1) {
+                columnNumber = 3; 
+            }
+            else {
+                columnNumber = 6; 
+            }
         }
 
         for (int i = 0; i < Constants.GRID_SIZE; i++) {
             cell[i] = new Cell(values[i], rowNumber, columnNumber); 
+
+            /*
+             * The following section calculates how to increment the row and column indicies as we iterate through the Cells in our Section. 
+             * To follow the logic easily, draw out a 9x9 grid with the row, column, and box indices labelled. 
+             * 
+             * - Logically we see that: 
+             *      If our Section is a row  ->  all Cells will have the same rowNumber, but the columnNumber increments for each Cell. 
+             *      If our Section is a column  ->  all Cells will have the same columnNumber, but the rowNumber increments for each Cell. 
+             * 
+             * - If our section is a box, we must do some extra work to get this information. 
+             *   Logically we see that:
+             *      If i (the iterator counter) is divisible by 3 with a remainder of either 1 or 2  ->  only the columnNumber is incremented.
+             *      If i (the iterator counter) is divisible by 3 with 0 remainders  ->  we have started a new row and will only increment rowNumber then. 
+             *      If i (the iterator counter) is divisible by 3 with 0 remainders  ->  the columnNumber goes back to it's initial value (i.e., remove the last 2 iterations it went through)
+             */
+            if (type == "R") {
+                columnNumber++; 
+            }
+            else if (type == "C") {
+                rowNumber++; 
+            }
+            else {
+                if (i % 3 == 0) {
+                    rowNumber++; 
+                    columnNumber -= 2; 
+                }
+                else {
+                    columnNumber++; 
+                }
+
+            }
         }
 
-
-        if (checkCompletion()) {
-            complete = true; 
-        }
-        else {
-            complete = false; 
-        }
-
+        checkCompletion(); 
     }
 
 
     //Getters
     public boolean isComplete() { return complete; }
+    public Cell getCell(int index) { return cell[index]; }
 
 
     //Others
-    public boolean checkCompletion() {
+    /**
+     * Edit the value of a single Cell in the Section. 
+     * 
+     * @param value An int representing the new value of the Cell. 
+     * @param index An int representing the index of the Cell to be changed. 
+     * @return  true if task was completed successfully. 
+     */
+    public boolean edit(int value, int index) {
+        //Function that calls this function will do all error checks on inputs, thus no need to check input validity here.
+        
+        cell[index].setValue(value);
+        checkCompletion(); 
         return true; 
     }
 
+    /**
+     * Check if all Cells in our Section have their final value, in which case our Section can be labelled as complete. 
+     * 
+     * @return true if Section is complete, and false otherwise.
+     */
+    public boolean checkCompletion() {
+        for (int i = 0; i < Constants.GRID_SIZE; i++) {
+            if (cell[i].isComplete()) {
+                complete = true; 
+                return true; 
+            }
+        }
+
+        complete = false; 
+        return false; 
+    }
+
+    /**
+     * Clear all Cells in our Section by removing their values.
+     * 
+     * @return true if task was completed successfully. 
+     */
     public boolean clear() {
         for (int i = 0; i < Constants.GRID_SIZE; i++) {
             cell[i].clear(); 
@@ -89,13 +176,54 @@ public class Section {
         return true; 
     }
 
-    public boolean solve() {
+    /**
+     * For any Cell in our Section with an unknown value, fill their potentialValue set with all the possible numbers they could possible be.
+     * 
+     * @return true if task was completed successfully, and false otherwise. 
+     */
+    public boolean fillPotentialValues() {
+        Set<Integer> unusedValues = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 5, 7, 8, 9)); 
+
+        for (int i = 0; i < Constants.GRID_SIZE; i++) {
+            //If a Cell has their final value calculated, no other Cell in that Section can be that value (no duplicates)
+            if (cell[i].isComplete()) {
+                unusedValues.remove(cell[i].getValue()); 
+            }
+        }
+   
+        for (int i = 0; i < Constants.GRID_SIZE; i++) {
+            if (!cell[i].isComplete()) {
+                Iterator<Integer> it = unusedValues.iterator(); 
+
+                for (Integer value: unusedValues) {
+                    cell[i].addPotentialValue(value); 
+                }
+            }
+        }        
+
         return true;
     }
 
+    //RemovePotentialValue(int value) function ?  --- purpose is to remove that value from the potentialValue set of all Cells in this Section 
+
+    /**
+     * Represents the Section as a String. 
+     * 
+     * @return The value at all Cells in the Section in string format, with a 2-space gap between each Cell value and a 4-space gap between each subsection of 3 Cells.  
+     * 
+     */
     public String toString() {
-        return ""; 
-  
+        String toReturn = ""; 
+
+        for (int i = 0; i < Constants.GRID_SIZE; i++) {
+            if (i % 3 == 0 && i != 0) {
+                toReturn += "  "; 
+            }
+
+            toReturn += cell[i].getValue() + "  "; 
+        }
+
+        return toReturn; 
     }
     
 }
