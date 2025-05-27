@@ -2,6 +2,7 @@
 
 package Model; 
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -106,6 +107,41 @@ public class Cell {
      */
     public boolean removePotentialValue(int value) {
         return potentialValues.remove(value); 
+    }
+
+
+    /**
+     * Fill potentialValues variable with all possible numbers that the Cell could potentially be. 
+     * 
+     * @param s1 The first Section that the Cell exists in (i.e., its row Section). 
+     * @param s2 The second Section that the Cell exists in (i.e., its column Section). 
+     * @param s3 The third Section that the Cell exists in (i.e., its box Section). 
+     * @return true if task was completed successfully, and false otherwise. 
+     */
+    public boolean fillPotentalValues(Section s1, Section s2, Section s3) {
+        if (complete) {
+            return false; 
+        }
+
+        potentialValues.clear();
+        Set<Integer> unusedValues = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 5, 7, 8, 9)); 
+
+        for (int i = 0; i < Constants.GRID_SIZE; i++) {
+            if (s1.getCell(i).isComplete()) {
+                unusedValues.remove(s1.getCell(i).getValue()); 
+            }
+
+            if (s2.getCell(i).isComplete()) {
+                unusedValues.remove(s2.getCell(i).getValue());
+            }
+
+            if (s3.getCell(i).isComplete()) {
+                unusedValues.remove(s3.getCell(i).getValue());
+            }
+        }
+
+        potentialValues = unusedValues; 
+        return true; 
     }
 
     /**

@@ -176,33 +176,6 @@ public class Section {
         return true; 
     }
 
-    /**
-     * For any Cell in our Section with an unknown value, fill their potentialValue set with all the possible numbers they could possible be.
-     * 
-     * @return true if task was completed successfully, and false otherwise. 
-     */
-    public boolean fillPotentialValues() {
-        Set<Integer> unusedValues = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5, 5, 7, 8, 9)); 
-
-        for (int i = 0; i < Constants.GRID_SIZE; i++) {
-            //If a Cell has their final value calculated, no other Cell in that Section can be that value (no duplicates)
-            if (cell[i].isComplete()) {
-                unusedValues.remove(cell[i].getValue()); 
-            }
-        }
-   
-        for (int i = 0; i < Constants.GRID_SIZE; i++) {
-            if (!cell[i].isComplete()) {
-                Iterator<Integer> it = unusedValues.iterator(); 
-
-                for (Integer value: unusedValues) {
-                    cell[i].addPotentialValue(value); 
-                }
-            }
-        }        
-
-        return true;
-    }
 
     //RemovePotentialValue(int value) function ?  --- purpose is to remove that value from the potentialValue set of all Cells in this Section 
 

@@ -115,12 +115,38 @@ public class Puzzle {
         return true; 
     }
 
+    /**
+     * For any Cell in our Puzzle with an unknown value, fill their poentialValue set with all the possible numbers they could possibly be.
+     * 
+     * @return true if task was completed successfully, and false otherwise.
+     */
+    public boolean fillPotentalValues() {
+        for (int i = 0; i < Constants.GRID_SIZE; i++) {
+            
+        }
+
+        return true; 
+    }
+
     public boolean solve() {
+        boolean complete = false; 
+
+        while (!complete) {
+            for (int i = 0; i < Constants.GRID_SIZE; i++) {
+                if (!row[i].isComplete())
+                {
+
+                }
+
+            }
+
+        }
+
+        return true; 
+
         /*
          * Last function to complete.. main algorithm. 
          * Make sure to consider all details and edge cases. 
-         * 
-         * Also write the algorithm in pseudocode before coding it. 
          */
 
         /* Algorithm in psuedocode (fast, to be refractors for better clarification): 
@@ -156,8 +182,6 @@ public class Puzzle {
          *              This loop is also the one where it needs to be terminated via a condition because we dont know how many iterations this will take. 
          * 
          */
-
-        return true; 
     }
 
     /**
