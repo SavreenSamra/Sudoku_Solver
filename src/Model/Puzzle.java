@@ -118,70 +118,61 @@ public class Puzzle {
     /**
      * For any Cell in our Puzzle with an unknown value, fill their poentialValue set with all the possible numbers they could possibly be.
      * 
-     * @return true if task was completed successfully, and false otherwise.
+     * @return true if task was completed successfully. 
      */
     public boolean fillPotentalValues() {
         for (int i = 0; i < Constants.GRID_SIZE; i++) {
-            
+            if (!row[i].isComplete()) {
+                //There must be >= 1 Cell that has an unknown value in this row, find them all and fill their potentialValues
+                Cell curCell; 
+
+                for (int l = 0; l < Constants.GRID_SIZE; l++) {
+                    curCell = row[i].getCell(l); 
+                    curCell.fillPotentalValues(row[curCell.getRowNumber()], column[curCell.getColumnNumber()], box[curCell.getBoxNumber()]); 
+                }
+            }
         }
 
         return true; 
     }
 
+    /**
+     * Solve the puzzle, meaning give all Cell their final value. 
+     * 
+     * @return true if task completed successfully. 
+     */
     public boolean solve() {
-        boolean complete = false; 
+        boolean completed = false; 
+        fillPotentalValues(); 
+        Cell curCell; 
+        int value; 
 
-        while (!complete) {
+        while (!completed) {
+            //Find a Cell that has a potentialValue set of size 1 
             for (int i = 0; i < Constants.GRID_SIZE; i++) {
-                if (!row[i].isComplete())
-                {
+                for (int l = 0; l < Constants.GRID_SIZE; l++) {
+                    curCell = row[i].getCell(l); 
+                    value = curCell.finalValue(); 
 
+                    if (value != 0) {
+                        curCell.setValue(value);
+
+                        row[i].removePotentialValue(value); 
+                        column[curCell.getColumnNumber()].removePotentialValue(value); 
+                        box[curCell.getBoxNumber()].removePotentialValue(value); 
+                    }
                 }
+            }
+          
+            if (checkCompletion()) {
+                completed = true; 
+                complete = true; 
 
             }
 
         }
 
         return true; 
-
-        /*
-         * Last function to complete.. main algorithm. 
-         * Make sure to consider all details and edge cases. 
-         */
-
-        /* Algorithm in psuedocode (fast, to be refractors for better clarification): 
-         * 
-         * 
-         * We will iterate through all the cells. Therefore, perhaps simply iterate through all the cells in each row. 
-         * 
-         * We will look for the first row that is not complete. There must be a Cell in this row without its final value. 
-         * 
-         * We iterate through the row to find the Cell that is incomplete. 
-         *  This cell should have it's row, column, and box filled with potential values. 
-         *      Perhaps seperate this process into it's own fillPotentialValues() function in Puzzle. 
-         *      The main problem is perhaps the column.fillPotentalValues() will give it a potential value that is not possible based on the row it exists in. 
-         *      Solution --> move fillPotentialValues() function here, so it can fill a Cell based on all 3. Same code, but our unusedValue set is checked by the row, column, and box (instead of singularly) -- it should only fill a singular cell with each call tho. 
-         * 
-         * Once that is done, the idea is:
-         * We can now fill a Cell with its potential values. We check if there is only 1 element in potential value (in which case this must be the only value it can be and thus it's final value)
-         *      In this case, we must edit the cell, which can be done with previous function. 
-         *      Edit will check completion status, so each time we edit a Cell check if it complete, at which point exit the loop. 
-         * 
-         * Otherwise, keep iterating through the Cells.
-         * 
-         * NOTE, perhaps, the first time we saw a Cell we did fillPotentialValues() and gave it a set. 
-         * The second time we saw it, it now has a value that is in its potential values but has already been set (i.e., between the first and second time we land on this Cell)
-         * So not that potential value still exists, as we never removed it from the potential value of this cell. 
-         * 
-         * IDEA: we only run fillPotentialValues ONCE the first thru every cell. We know how many iterations this will be and can control that. 
-         *       Then, we start go through the puzzle over and over again, checking if each unsolved cell has only 1 element in the fillPOtentialValues. 
-         *              If there si only 1 potential value, we have a helper function that removes this value as a potentialValue for all unsolved cells in it's row, column, and box
-         *                  This can either be done in edit, or simply a helper function we call only here. 
-         *                  Probably better to keep it seperate to ensure seperation of duty (i.e., we edit when user it changing an unsolved puzzle too, not just when solving ; but this helper function is specifically when we are solving a puzzle)
-         *             This way, we ensure potentialValues are maintained correctly, and we only fill it once. From there, we simply remove it. 
-         *              This loop is also the one where it needs to be terminated via a condition because we dont know how many iterations this will take. 
-         * 
-         */
     }
 
     /**

@@ -2,11 +2,6 @@
 
 package Model;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 public class Section {
     private Cell[] cell; 
     private boolean complete; 
@@ -177,7 +172,20 @@ public class Section {
     }
 
 
-    //RemovePotentialValue(int value) function ?  --- purpose is to remove that value from the potentialValue set of all Cells in this Section 
+    /**
+     * For all Cells in our Section with an unknown value, remove a value from their potentialValue set. 
+     * 
+     * @param value An int representing the value to remove from potentialValue sets. 
+     * @return true if task completed successfully. 
+     */
+    public boolean removePotentialValue(int value) {
+        for (int i = 0; i < Constants.GRID_SIZE; i++) {
+            if (!cell[i].isComplete()) {
+                cell[i].removePotentialValue(value); 
+            }
+        }
+        return true; 
+    }
 
     /**
      * Represents the Section as a String. 

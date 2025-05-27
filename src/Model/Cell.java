@@ -54,6 +54,7 @@ public class Cell {
     public int getColumnNumber() { return columnNumber; }
     public int getBoxNumber() { return boxNumber; }
     public int getValue() { return value; }
+    public Set<Integer> getPotentialValues() { return potentialValues; }
 
 
     //Setters:
@@ -66,6 +67,7 @@ public class Cell {
         }
 
         this.value = value; 
+        potentialValues.clear();
     }
 
 
@@ -81,6 +83,21 @@ public class Cell {
         potentialValues.clear();
         complete = false; 
         return true; 
+    }
+
+    /**
+     * Return, but do not set, the final value of a Cell (if known final value). 
+     * 
+     * @return 0 to represent unknown final Value, or an int between [1, 9] representing the final value of the Cell. 
+     */
+    public int finalValue() {
+        if (complete || potentialValues.size() != 1) {
+            return 0; 
+        }
+        else {
+            return potentialValues.iterator().next(); //only 1 element in set, which represents the only value the Cell can be 
+        }
+
     }
 
     /**
