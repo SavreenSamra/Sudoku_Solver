@@ -8,6 +8,8 @@ public class Puzzle {
     private Section[] box; 
     private boolean complete; 
 
+
+
     //Constructors:
     /**
      * Constructor for an empty puzzle, where all Cells have a value of 0. 
@@ -30,9 +32,12 @@ public class Puzzle {
         }
     }
 
+
+
     //Getters
     public boolean isComplete() { return complete; }
 
+    
 
     //Others:
     /**

@@ -6,6 +6,8 @@ public class Section {
     private Cell[] cell; 
     private boolean complete; 
 
+
+
     //Constructors 
     /**
      * Constructor for a Section, which are 9 Cells grouped together in the puzzle. 
@@ -120,11 +122,13 @@ public class Section {
     }
 
 
+
     //Getters
     public boolean isComplete() { return complete; }
     public Cell getCell(int index) { return cell[index]; }
 
 
+    
     //Others
     /**
      * Edit the value of a single Cell in the Section. 

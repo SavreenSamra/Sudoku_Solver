@@ -15,8 +15,8 @@ public class Cell {
     private boolean complete; 
 
 
+    
     //Constructors:
-
     /**
      * Constructor for a single cell. 
      * 
@@ -48,6 +48,7 @@ public class Cell {
     }
     
 
+
     //Getters:
     public boolean isComplete() { return complete; }
     public int getRowNumber() { return rowNumber; }
@@ -55,6 +56,7 @@ public class Cell {
     public int getBoxNumber() { return boxNumber; }
     public int getValue() { return value; }
     public Set<Integer> getPotentialValues() { return potentialValues; }
+
 
 
     //Setters:
