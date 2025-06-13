@@ -61,6 +61,11 @@ public class Cell {
 
     //Setters:
     public void setValue(int value) { 
+        /*
+        Best practice is to check that the arguement is valid by calling Constants.checkValue(value)
+        However, this method is only used by developers and users do not have access to it, thus I excluded the safety check
+        */
+
         if (value == 0) {
             complete = false; 
         }
@@ -75,18 +80,6 @@ public class Cell {
 
 
     //Other:
-    /**
-     * Clear the Cell of it's value. 
-     * 
-     * @return  true if task was completed successfully. 
-     */
-    public boolean clear() {
-        value = Constants.UNKNOWN_VALUE; 
-        potentialValues.clear();
-        complete = false; 
-        return true; 
-    }
-
     /**
      * Return, but do not set, the final value of a Cell (if known final value). 
      * 
@@ -113,7 +106,10 @@ public class Cell {
             return false; 
         }
 
-        //Could check value is between [1, 9]; however users will not have direct access to this function, thus not necessary. 
+        /*
+        Best practice is to check that the arguement is valid by calling Constants.checkValue(value)
+        However, this method is only used by developers and users do not have access to it, thus I excluded the safety check
+        */
 
         return potentialValues.add(value); 
     }

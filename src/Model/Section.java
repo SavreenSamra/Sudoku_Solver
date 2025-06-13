@@ -169,7 +169,7 @@ public class Section {
      */
     public boolean clear() {
         for (int i = 0; i < Constants.GRID_SIZE; i++) {
-            cell[i].clear(); 
+            cell[i].setValue(0);; 
         }
         complete = false; 
         return true; 
